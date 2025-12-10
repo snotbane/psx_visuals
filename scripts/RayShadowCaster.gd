@@ -34,6 +34,8 @@ func _init() -> void:
 
 
 func _process(delta: float) -> void:
+	global_rotation = Vector3.ZERO
+
 	mesh.visible = is_colliding()
 	if not mesh.visible: return
 
