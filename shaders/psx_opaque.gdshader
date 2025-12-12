@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, vertex_lighting, ensure_correct_normals, diffuse_lambert, specular_occlusion_disabled, specular_disabled, shadows_disabled, fog_disabled, cull_disabled;
+render_mode blend_mix, vertex_lighting, diffuse_lambert, specular_occlusion_disabled, specular_disabled, shadows_disabled, fog_disabled;
 
 #include "uid://bbm41nyy2th3f"
 
@@ -14,9 +14,6 @@ uniform bool use_vertex_colors_in_albedo = true;
 
 // If enabled, use global PSX fog. Otherwise, fog will not appear on these surfaces, as if there is a hole in the fog.
 uniform bool use_global_fog = true;
-
-// If enabled, this approximates the correct normals for backfaces, as if the mesh is double-sided.
-uniform bool flip_backface_normals = true;
 
 uniform sampler2D albedo: hint_default_white, filter_nearest;
 uniform vec4 albedo_tint: source_color = vec4(1);
@@ -43,14 +40,6 @@ void vertex() {
 	fog_strength = (use_global_fog && psx_fog_near != psx_fog_far) ?
 		clamp(psx_fog_color.a * (VERTEX_DEPTH - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
 		0.0;
-
-	if (flip_backface_normals) {
-		vec3 normal_world = MODEL_NORMAL_MATRIX * NORMAL;
-		vec3 view_dir = normalize(CAMERA_POSITION_WORLD - vertex_world);
-
-		bool back_facing = dot(normal_world, view_dir) < 0.0;
-		if (back_facing) NORMAL = -NORMAL;
-	}
 }
 
 void fragment() {
